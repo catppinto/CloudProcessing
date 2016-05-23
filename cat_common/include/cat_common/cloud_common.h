@@ -1,0 +1,105 @@
+#ifndef CLOUD_COMMON_H
+#define CLOUD_COMMON_H
+
+#include <iostream>
+#include <string>
+
+#include <std_srvs/Empty.h>
+#include <sensor_msgs/PointCloud2.h>
+
+#include <pcl/point_types.h>
+#include <pcl/point_cloud.h>
+#include <pcl_conversions/pcl_conversions.h>
+#include <pcl/visualization/cloud_viewer.h>
+#include <pcl/visualization/pcl_visualizer.h>
+#include <pcl/PCLPointCloud2.h>
+#include <pcl/ModelCoefficients.h>
+#include <pcl/io/pcd_io.h>
+#include <pcl/sample_consensus/method_types.h>
+#include <pcl/sample_consensus/model_types.h>
+#include <pcl/segmentation/sac_segmentation.h>
+#include <pcl/filters/extract_indices.h>
+#include <pcl/filters/passthrough.h>
+#include <pcl/features/normal_3d.h>
+#include <pcl/common/centroid.h>
+
+#include <pcl/filters/project_inliers.h>
+#include <pcl/surface/convex_hull.h>
+#include <pcl/segmentation/extract_polygonal_prism_data.h>
+#include <pcl/segmentation/extract_clusters.h>
+#include <geometry_msgs/PoseStamped.h>
+
+#include <pcl/surface/mls.h>
+
+
+typedef pcl::PointCloud<pcl::PointXYZ > Cloud_xyz;
+typedef pcl::PointCloud<pcl::Normal> Normal;
+typedef pcl::PCLPointCloud2 Cloud2;
+
+
+class CloudClass{
+private:
+    Cloud_xyz::Ptr originalCloud;
+    Cloud_xyz::Ptr filteredCloud;
+    Cloud_xyz::Ptr planeCloud;
+    pcl::PointIndices::Ptr planeInliers;
+    pcl::ModelCoefficients::Ptr planeCoefficients;
+
+
+    Cloud_xyz::Ptr cylinderCloud;
+    Normal::Ptr smoothedNormals;
+    int saving_counter;
+
+    // private functions
+    Cloud_xyz::Ptr convertToPointCloud1(Cloud2::Ptr cloud);
+    //computations
+    Eigen::Vector4f computeCentroid(Cloud_xyz::Ptr cloud);
+    //extractors
+
+    Normal::Ptr normalEstimation(Cloud_xyz::Ptr cloud, int k);
+    Cloud_xyz::Ptr extractFromModel(Cloud_xyz::Ptr cloud, Normal::Ptr normals, std::string model);
+
+public:
+    CloudClass();
+    CloudClass(const sensor_msgs::PointCloud2ConstPtr& cloud_msg);
+    CloudClass(std::string filename);
+
+    //set and get
+    void loadCloud(const sensor_msgs::PointCloud2ConstPtr& cloud_msg);
+    Cloud_xyz::Ptr loadCloud(std::string filename);
+
+    Cloud_xyz::Ptr getCloud(char cloudType);
+
+    Normal::Ptr getSmoothedNormal();
+    int getSavingCounter();
+
+    //show
+    void showOriginalCloud(bool imageFromCamera);
+    void showCloud(bool imageFromCamera, Cloud_xyz::Ptr cloudToShow);
+
+    //filters
+    void filterZ(int minLimit, int maxLimit);
+    void surfaceSmoothing();
+
+    //plane extraction
+    Cloud_xyz::Ptr extractPlane();
+	pcl::PointIndices::Ptr getPlaneIndices(){return this->planeInliers;}
+	pcl::ModelCoefficients::Ptr getPlaneModelCoefficients(){return this->planeCoefficients;}
+    Cloud_xyz::Ptr extractCylinderFromTable();
+    Cloud_xyz::Ptr extractObjectsOnTable();
+    Cloud_xyz::Ptr extractCylinderFromObjects(Cloud_xyz::Ptr cloud);
+    void extractObjectClusters(Cloud_xyz::Ptr cloud);
+
+    Eigen::Vector4f getCylinderCentroid();
+
+    //saving
+    void storeCloud(Cloud_xyz::Ptr cloudToSave, std::string filename);
+};
+
+
+
+
+
+
+
+#endif // CLOUDPROCESSING_H

@@ -1,0 +1,43 @@
+cmake_minimum_required(VERSION 2.8.3)
+project(cat_cloud_processing)
+
+## Find catkin and any catkin packages
+find_package(PCL REQUIRED)
+find_package(catkin REQUIRED COMPONENTS
+  rospy
+  roscpp
+  cat_common
+  sensor_msgs
+  std_msgs
+  image_transport
+  cv_bridge
+  pcl_conversions
+  pcl_msgs
+  std_srvs
+  cat_common
+)
+
+
+catkin_package()
+
+#Build talker and listener
+include_directories(include 
+	${catkin_INCLUDE_DIRS} 
+	${PCL_INCLUDE_DIRS})
+link_directories(${PCL_LIBRARY_DIRS}) 
+
+
+#add_executable(cloudProc src/cloudProc.cpp)
+#target_link_libraries(cloudProc ${catkin_LIBRARIES} ${PCL_LIBRARIES})
+
+#add_executable(extract_tests src/extract_tests.cpp)
+#target_link_libraries(extract_tests ${catkin_LIBRARIES} ${PCL_LIBRARIES})
+
+#add_executable(extract_cylinder src/extract_cylinder.cpp)
+#target_link_libraries(extract_cylinder ${catkin_LIBRARIES} ${PCL_LIBRARIES})
+
+add_executable(storeCloud src/storeCloud.cpp)
+target_link_libraries(storeCloud ${catkin_LIBRARIES} ${PCL_LIBRARIES})
+
+add_executable(HERBpcl src/HERB_tableDetection.cpp)
+target_link_libraries(HERB_tableDetection ${catkin_LIBRARIES} ${PCL_LIBRARIES})
