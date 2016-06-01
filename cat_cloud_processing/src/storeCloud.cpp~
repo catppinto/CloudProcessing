@@ -18,6 +18,7 @@
 typedef pcl::PointCloud< pcl::PointXYZ > Cloud_xyz;
 typedef pcl::PCLPointCloud2 Cloud2;
 
+std::string filepath;
 
 Cloud_xyz::Ptr cloud_xyz1 (new Cloud_xyz());
 int counter;
@@ -75,7 +76,7 @@ int main(int argc, char** argv){
     ros::NodeHandle nh;
 
     ros::Subscriber sub = nh.subscribe("/head/kinect2/qhd/points", 1, cloud_cb);
-    ros::ServiceServer service = nh.advertiseService("storecloud", store);
+    ros::ServiceServer service = nh.advertiseService("storeCloud", store);
 
     ros::spin();
 

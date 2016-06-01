@@ -15,29 +15,29 @@ CloudClass cloud;
 
 int savingCounter;
 
-/**
- * If the equation of the plane is ax+by+cz+d=0, the pose (R,t) is such that it takes the horizontal plane (z=0)
- * to the current equation
- */
-void getPlaneTransform(const cv::Vec4f& plane_coefficients, cv::Matx33f& rotation, cv::Vec3f& translation)
-{
-  double a = plane_coefficients[0], b = plane_coefficients[1], c = plane_coefficients[2], d = plane_coefficients[3];
-  // assume plane coefficients are normalized
-  translation = cv::Vec3f(-a * d, -b * d, -c * d);
-  cv::Vec3f z(a, b, c);
+///**
+// * If the equation of the plane is ax+by+cz+d=0, the pose (R,t) is such that it takes the horizontal plane (z=0)
+// * to the current equation
+// */
+//void getPlaneTransform(const cv::Vec4f& plane_coefficients, cv::Matx33f& rotation, cv::Vec3f& translation)
+//{
+//  double a = plane_coefficients[0], b = plane_coefficients[1], c = plane_coefficients[2], d = plane_coefficients[3];
+//  // assume plane coefficients are normalized
+//  translation = cv::Vec3f(-a * d, -b * d, -c * d);
+//  cv::Vec3f z(a, b, c);
 
-  //try to align the x axis with the x axis of the original frame
-  //or the y axis if z and x are too close too each other
-  cv::Vec3f x(1, 0, 0);
-  if (fabs(z.dot(x)) > 1.0 - 1.0e-4)
-    x = cv::Vec3f(0, 1, 0);
-  cv::Vec3f y = z.cross(x);
-  x = y.cross(z);
-  x = x / norm(x);
-  y = y / norm(y);
+//  //try to align the x axis with the x axis of the original frame
+//  //or the y axis if z and x are too close too each other
+//  cv::Vec3f x(1, 0, 0);
+//  if (fabs(z.dot(x)) > 1.0 - 1.0e-4)
+//    x = cv::Vec3f(0, 1, 0);
+//  cv::Vec3f y = z.cross(x);
+//  x = y.cross(z);
+//  x = x / norm(x);
+//  y = y / norm(y);
 
-  rotation = cv::Matx33f(x[0], y[0], z[0], x[1], y[1], z[1], x[2], y[2], z[2]);
-}
+//  rotation = cv::Matx33f(x[0], y[0], z[0], x[1], y[1], z[1], x[2], y[2], z[2]);
+//}
 
 
 
@@ -66,9 +66,6 @@ void cloud_cb(const sensor_msgs::PointCloud2ConstPtr& cloud_msg){
 	std::cout << "Model Coefs : " << std::endl;
 	std::cout << *modelCoeffs << std::endl;
 
-
-
-
 }
 
 bool storePlaneCloudFromService(std_srvs::Empty::Request  &req, std_srvs::Empty::Response &res){
@@ -88,14 +85,14 @@ bool storePlaneCloudFromService(std_srvs::Empty::Request  &req, std_srvs::Empty:
     else
     {
 	int counter = cloud.getSavingCounter();
-        filename = "/home/apirespi/my_workspace/src/cat_cloud_processing/pcd_files_storage/planeClouds/planecloud_" +
+        filename = "/home/apirespi/my_workspace/src/cat_cloud/cat_cloud_processing/pcd_files_storage/planeClouds/planecloud_" +
               boost::to_string(savingCounter)
               + ".pcd";
         ROS_INFO("Saving in : %s data points.", filename.c_str());
         pcl::io::savePCDFileASCII(filename, *planecloud);
 
 	// save original
-	 filename = "/home/apirespi/my_workspace/src/cat_cloud_processing/pcd_files_storage/planeClouds/originalcloud_" +
+	 filename = "/home/apirespi/my_workspace/src/cat_cloud/cat_cloud_processing/pcd_files_storage/planeClouds/originalcloud_" +
 		      boost::to_string(savingCounter)
               + ".pcd";
         ROS_INFO("Saving in : %s data points.", filename.c_str());
